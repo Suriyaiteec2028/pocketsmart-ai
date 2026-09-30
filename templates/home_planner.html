@@ -1,0 +1,180 @@
+{% extends "base_app.html" %}
+
+{% block title %}Home Interior Budget Planner – PocketSmart AI{% endblock %}
+{% block page_title %}Home Interior Planner{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 0 auto;">
+  <!-- Header -->
+  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-home"><i class="fa-solid fa-couch"></i> Interior Planner</span>
+      </div>
+      <h1 style="font-size: 2rem;">Home Interior Budget Planner</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Intelligently allocate your spending limit across rooms, select furniture essentials, and find value-for-money recommendations.
+      </p>
+    </div>
+    <a href="/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  </div>
+
+  <form id="home-planner-form">
+    <!-- Step 1: Overall Budget & Home Type -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <h3 class="card-title"><i class="fa-solid fa-wallet" style="color: var(--primary);"></i> 1. Budget & Property Details</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="budget" class="form-label">Total Budget (INR ₹) <span class="required">*</span></label>
+          <div style="position: relative;">
+            <input type="number" id="budget" class="form-control" placeholder="e.g. 100000" min="5000" step="1000" value="100000" required>
+          </div>
+          <div class="form-hint">Default currency is INR. AI will strictly ensure spending stays within this limit.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="home-type" class="form-label">Home Type <span class="required">*</span></label>
+          <select id="home-type" class="form-select">
+            <option value="Apartment" selected>Apartment (1BHK / 2BHK / 3BHK)</option>
+            <option value="House">Independent House / Floor</option>
+            <option value="Studio">Studio Apartment</option>
+            <option value="Villa">Villa / Bungalow</option>
+            <option value="Other">Other Residential Space</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Room Selection -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <h3 class="card-title"><i class="fa-solid fa-house-chimney" style="color: var(--primary);"></i> 2. Select Rooms to Furnish</h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+        Check every room you want included in your budget allocation. Specific product checklists will appear below for each selection.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Living Room" checked>
+          <span style="font-weight: 600; font-size: 0.9rem;">Living Room</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Bedroom" checked>
+          <span style="font-weight: 600; font-size: 0.9rem;">Bedroom</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Kitchen">
+          <span style="font-weight: 600; font-size: 0.9rem;">Kitchen</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Dining Room">
+          <span style="font-weight: 600; font-size: 0.9rem;">Dining Room</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Study Room">
+          <span style="font-weight: 600; font-size: 0.9rem;">Study Room</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Balcony">
+          <span style="font-weight: 600; font-size: 0.9rem;">Balcony</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Bathroom">
+          <span style="font-weight: 600; font-size: 0.9rem;">Bathroom</span>
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; background: #fff;">
+          <input type="checkbox" name="rooms" value="Other">
+          <span style="font-weight: 600; font-size: 0.9rem;">Other</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Step 3: Dynamic Room Items Builder -->
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> 3. Room Items & Preferences
+      </h3>
+      <div id="selected-rooms-items-container">
+        <!-- Dynamically generated by home.js -->
+      </div>
+    </div>
+
+    <!-- Step 4: Styling & Allocation Strategy -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <h3 class="card-title"><i class="fa-solid fa-palette" style="color: var(--primary);"></i> 4. Style & Spending Strategy</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="overall-style" class="form-label">Overall Style</label>
+          <select id="overall-style" class="form-select">
+            <option value="Modern" selected>Modern (Clean lines, functional, warm woods)</option>
+            <option value="Minimalist">Minimalist (Decluttered, monochrome, space-focused)</option>
+            <option value="Scandinavian">Scandinavian (Nordic blonde woods, soft neutrals)</option>
+            <option value="Traditional">Traditional (Classic wooden carving, warm brass tones)</option>
+            <option value="Industrial">Industrial (Raw metal, dark wood, exposed finishes)</option>
+            <option value="Luxury">Luxury (Plush fabrics, gold accents, premium aesthetics)</option>
+            <option value="Budget Friendly">Budget Friendly (Max utility, high durability per rupee)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="allocation-pref" class="form-label">Budget Allocation Strategy</label>
+          <select id="allocation-pref" class="form-select">
+            <option value="Balanced" selected>Balanced (Fair division across all selected rooms)</option>
+            <option value="Essentials First">Essentials First (Prioritize Bed & Sofa before decor)</option>
+            <option value="Lowest Cost">Lowest Cost (Maximize remaining savings)</option>
+            <option value="Premium Focus">Premium Focus (Spend closer to ceiling on anchor pieces)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="additional-notes" class="form-label">Additional Requirements / Free Text Notes</label>
+        <textarea id="additional-notes" class="form-textarea" rows="3" placeholder="e.g. I want a minimalist living room with warm lighting and space for a 55-inch TV. Keep kitchen storage simple."></textarea>
+      </div>
+    </div>
+
+    <!-- Submit CTA -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <button type="submit" id="generate-btn" class="btn btn-lg btn-primary" style="padding: 1rem 3rem; font-size: 1.15rem;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Smart Home Plan
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Multi-Step Animated Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-card">
+    <div class="loading-spinner"></div>
+    <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Generating Home Plan</h3>
+    <p style="color: var(--text-muted); font-size: 0.875rem;">PocketSmart AI is processing your requirements...</p>
+
+    <div class="loading-steps">
+      <div id="step-1" class="step-item active">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Analyzing your room requirements & style...</span>
+      </div>
+      <div id="step-2" class="step-item">
+        <i class="fa-regular fa-circle"></i>
+        <span>Allocating budget mathematically across categories...</span>
+      </div>
+      <div id="step-3" class="step-item">
+        <i class="fa-regular fa-circle"></i>
+        <span>Finding value-for-money recommendations...</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/home.js"></script>
+{% endblock %}

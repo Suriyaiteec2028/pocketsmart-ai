@@ -1,0 +1,261 @@
+{% extends "base_public.html" %}
+
+{% block title %}PocketSmart AI – Plan smarter. Spend better.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="padding: 4rem 1.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
+  <div class="badge badge-home" style="margin-bottom: 1.25rem; font-size: 0.85rem; padding: 0.4rem 1rem;">
+    <i class="fa-solid fa-sparkles"></i> AI-Powered Budget & Shopping Assistant
+  </div>
+  <h1 style="font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 1.25rem; color: #0f172a;">
+    Plan smarter. <span style="background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Spend better.</span>
+  </h1>
+  <p style="font-size: 1.2rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem;">
+    PocketSmart AI is an intelligent assistant that helps you plan homes, celebrations, and jewelry styling according to your personal spending limits. Tell us your budget, requirements, and preferences—our AI handles the math, vendor matching, and smart allocations.
+  </p>
+  <div class="hero-buttons" style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+    {% if user %}
+      <a href="/dashboard" class="btn btn-lg btn-primary"><i class="fa-solid fa-gauge"></i> Go to Dashboard</a>
+      <a href="/home-planner" class="btn btn-lg btn-secondary"><i class="fa-solid fa-couch"></i> Start New Plan</a>
+    {% else %}
+      <a href="/register" class="btn btn-lg btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Start Planning Free</a>
+      <a href="/login" class="btn btn-lg btn-secondary"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Planners Showcase Banner -->
+<section style="margin: 3rem 0;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Choose Your AI Planner</h2>
+    <p style="color: var(--text-muted);">Specialized recommendation engines built for distinct lifestyle needs</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem;">
+    <!-- Home Interior Card -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #4f46e5;">
+      <div>
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-sm); background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-couch"></i>
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.6rem;">Home Interior Planner</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+          Furnish apartments, living rooms, and bedrooms without budget blowouts. Automatically recommends furniture, lighting, curtains, and decor tailored to your style.
+        </p>
+        <ul style="list-style: none; font-size: 0.875rem; color: var(--text-main); margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Dynamic room selection</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Amazon, Flipkart, & IKEA sourcing</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Strict budget ceiling verification</li>
+        </ul>
+      </div>
+      <a href="/home-planner" class="btn btn-outline-primary" style="width: 100%;">
+        Plan Home Interior <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Party Planner Card -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #ec4899;">
+      <div>
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-sm); background: #fce7f3; color: #be185d; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-champagne-glasses"></i>
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.6rem;">Party & Event Planner</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+          Organize unforgettable birthdays, weddings, or corporate events. Dynamically divides budget across catering, venue, decorations, and entertainment.
+        </p>
+        <ul style="list-style: none; font-size: 0.875rem; color: var(--text-main); margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Guest count dynamic catering calculation</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Swiggy & Zomato catering packages</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> OYO Townhouse halls & accommodation</li>
+        </ul>
+      </div>
+      <a href="/party-planner" class="btn btn-outline-primary" style="width: 100%;">
+        Plan Event & Party <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Jewelry Planner Card -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #f59e0b;">
+      <div>
+        <div style="width: 52px; height: 52px; border-radius: var(--radius-sm); background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.6rem;">Jewelry & Outfit Planner</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+          Upload your outfit photo or specify colors to discover jewelry sets, necklaces, and earrings that complement your neckline and occasion aesthetics.
+        </p>
+        <ul style="list-style: none; font-size: 0.875rem; color: var(--text-main); margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Multimodal Gemini vision analysis</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Dominant color & tone detection</li>
+          <li><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 6px;"></i> Gold, Silver, & Imitation sets</li>
+        </ul>
+      </div>
+      <a href="/jewelry-planner" class="btn btn-outline-primary" style="width: 100%;">
+        Plan Jewelry Styling <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Core Features Grid -->
+<section style="margin: 5rem 0;">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Why Choose PocketSmart AI?</h2>
+    <p style="color: var(--text-muted);">Built from the ground up for reliable, real-world personal budgeting</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+      <div style="color: var(--primary); font-size: 1.75rem; margin-bottom: 1rem;"><i class="fa-solid fa-calculator"></i></div>
+      <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Smart Budget Planning</h4>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Automatically organizes your available funds across essential and decorative categories with strict mathematical guarantees.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="color: var(--secondary); font-size: 1.75rem; margin-bottom: 1rem;"><i class="fa-solid fa-sliders"></i></div>
+      <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Personalized Recommendations</h4>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Generate tailored product selections based on your style, room type, occasion, and priority levels.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="color: var(--warning); font-size: 1.75rem; margin-bottom: 1rem;"><i class="fa-solid fa-camera"></i></div>
+      <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Multimodal Vision AI</h4>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Upload photos of your clothing or outfit to identify complementary color tones, fabric patterns, and jewelry styles.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="color: var(--accent); font-size: 1.75rem; margin-bottom: 1rem;"><i class="fa-solid fa-shield-halved"></i></div>
+      <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Zero Hallucinations Guarantee</h4>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Every single AI recommendation is verified by our backend math engine to ensure your remaining balance is never negative.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 3.5rem 2rem; margin: 4rem 0;">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">How It Works</h2>
+    <p style="color: var(--text-muted);">Five simple steps to optimized personal budgeting</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; position: relative;">
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">1</div>
+      <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Enter Your Budget</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Specify your total spending limit in INR or your local currency.</p>
+    </div>
+
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">2</div>
+      <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">State Requirements</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Pick rooms, guest counts, themes, or upload your outfit photo.</p>
+    </div>
+
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">3</div>
+      <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">AI Allocation</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Gemini AI and our math engine balance spending across every category.</p>
+    </div>
+
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">4</div>
+      <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Review & Pick</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Explore matched products with source links, pricing, and reasons.</p>
+    </div>
+
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">5</div>
+      <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">Save & Revisit</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Save plans, favorite items, and reuse previous inputs anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Snippet -->
+<section style="margin: 4rem 0;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Loved by Planners & Shoppers</h2>
+    <p style="color: var(--text-muted);">Here is how PocketSmart AI makes life simpler</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+      <div style="color: #f59e0b; margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+      </div>
+      <p style="font-style: italic; color: var(--text-main); margin-bottom: 1.25rem;">
+        "I had a strict ₹1,20,000 budget for my new 2BHK. PocketSmart AI balanced the living room sofa, master bed, and kitchen essentials without going a single rupee over!"
+      </p>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0e7ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+          AK
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Ananya K.</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Home Interior Planner</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="color: #f59e0b; margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+      </div>
+      <p style="font-style: italic; color: var(--text-main); margin-bottom: 1.25rem;">
+        "Uploading my sister's wedding reception saree photo and getting instant matching silver choker sets within my ₹6,000 budget felt like having a personal stylist."
+      </p>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+          RM
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Rohan M.</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Jewelry Planner</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="color: #f59e0b; margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+      </div>
+      <p style="font-style: italic; color: var(--text-main); margin-bottom: 1.25rem;">
+        "Organized our college farewell for 60 guests with zero stress. The catering vs venue breakdown was spot on and saved us from last-minute budget deficits."
+      </p>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #fce7f3; color: #be185d; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+          PS
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Pooja S.</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Event Planner</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div style="text-align: center; margin-top: 2rem;">
+    <a href="/testimonials" class="btn btn-secondary"><i class="fa-solid fa-comments"></i> Read More Reviews</a>
+  </div>
+</section>
+
+<!-- Call to action card -->
+<section style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); color: #fff; border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center; box-shadow: var(--shadow-glow); margin: 3rem 0;">
+  <h2 style="font-size: 2.25rem; color: #fff; margin-bottom: 1rem;">Ready to plan your next purchase?</h2>
+  <p style="color: #c7d2fe; max-width: 600px; margin: 0 auto 2rem; font-size: 1.1rem;">
+    Join thousands who spend confidently with AI-driven budget allocations.
+  </p>
+  <a href="/register" class="btn btn-lg btn-secondary" style="background: #fff; color: #4338ca; font-weight: 700;">
+    Get Started Free <i class="fa-solid fa-arrow-right"></i>
+  </a>
+</section>
+{% endblock %}

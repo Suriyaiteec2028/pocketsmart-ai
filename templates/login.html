@@ -1,0 +1,57 @@
+{% extends "base_public.html" %}
+
+{% block title %}Sign In – PocketSmart AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 2.5rem auto;">
+  <div class="card" style="padding: 2.5rem 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div class="brand-icon" style="margin: 0 auto 1rem; width: 48px; height: 48px; font-size: 1.4rem;">
+        <i class="fa-solid fa-brain"></i>
+      </div>
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.35rem;">Welcome Back</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Sign in to access your budget plans & recommendations</p>
+    </div>
+
+    <!-- Error message banner -->
+    <div id="auth-error" style="display: none; background: var(--danger-light); color: var(--danger); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.875rem; border-left: 3px solid var(--danger);"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+        <div style="position: relative;">
+          <input type="email" id="email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password <span class="required">*</span></label>
+        <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.85rem;">
+        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+          <input type="checkbox" id="remember-me">
+          <span>Remember me</span>
+        </label>
+        <a href="#" onclick="showToast('Password reset link has been dispatched to your email.', 'info'); return false;" style="font-size: 0.85rem;">Forgot password?</a>
+      </div>
+
+      <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-muted);">
+      <div>New to PocketSmart AI?</div>
+      <a href="/register" class="btn btn-secondary" style="width: 100%; margin-top: 0.75rem; font-weight: 700;">
+        <i class="fa-solid fa-user-plus"></i> Register a New Account
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/auth.js"></script>
+{% endblock %}

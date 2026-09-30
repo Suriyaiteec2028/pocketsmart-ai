@@ -1,0 +1,229 @@
+{% extends "base_app.html" %}
+
+{% block title %}Dashboard – PocketSmart AI{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Welcome back, {{ user.name }}!</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Here is your personal budget summary and planner activity.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/history" class="btn btn-secondary"><i class="fa-solid fa-clock-rotate-left"></i> All Plans</a>
+      <a href="/home-planner" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Plan</a>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Metric Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+  <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+      <i class="fa-solid fa-layer-group"></i>
+    </div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Total Plans</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">{{ stats.total_plans }}</div>
+    </div>
+  </div>
+
+  <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+      <i class="fa-solid fa-couch"></i>
+    </div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Home Plans</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">{{ stats.home_plans }}</div>
+    </div>
+  </div>
+
+  <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: #fce7f3; color: #be185d; display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+      <i class="fa-solid fa-champagne-glasses"></i>
+    </div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Party Plans</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">{{ stats.party_plans }}</div>
+    </div>
+  </div>
+
+  <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+      <i class="fa-solid fa-gem"></i>
+    </div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Jewelry Plans</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">{{ stats.jewelry_plans }}</div>
+    </div>
+  </div>
+
+  <div class="card" style="display: flex; align-items: center; gap: 1.25rem;">
+    <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.35rem;">
+      <i class="fa-solid fa-bookmark"></i>
+    </div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Saved Items</div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">{{ stats.saved_count }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Planners & Services Section -->
+<div style="margin-bottom: 3rem;">
+  <h2 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Planners & Options
+  </h2>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+    <!-- 1. Home Interior Card -->
+    <div class="card" style="border-left: 4px solid #4f46e5; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="badge badge-home"><i class="fa-solid fa-couch"></i> Interior</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">INR / Global</span>
+        </div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Home Interior</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+          Furnish your apartment, villa, or studio room by room. Recommends verified sofas, beds, lighting, and storage within budget.
+        </p>
+      </div>
+      <a href="/home-planner" class="btn btn-primary" style="width: 100%;">
+        <i class="fa-solid fa-couch"></i> Start Planning
+      </a>
+    </div>
+
+    <!-- 2. Party & Event Card -->
+    <div class="card" style="border-left: 4px solid #ec4899; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="badge badge-party"><i class="fa-solid fa-champagne-glasses"></i> Celebration</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Banquets & Food</span>
+        </div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Party & Event</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+          Plan weddings, birthdays, or corporate celebrations. Balances catering, decoration, music, and guest accommodations.
+        </p>
+      </div>
+      <a href="/party-planner" class="btn btn-primary" style="width: 100%; background: #be185d; border-color: #be185d;">
+        <i class="fa-solid fa-champagne-glasses"></i> Start Planning
+      </a>
+    </div>
+
+    <!-- 3. Jewelry & Outfit Card -->
+    <div class="card" style="border-left: 4px solid #f59e0b; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="badge badge-jewelry"><i class="fa-solid fa-gem"></i> Multimodal AI</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Photo Styling</span>
+        </div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Jewelry & Outfit</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+          Upload your outfit photo to detect dominant shades and match necklaces, earrings, and bracelets within your spending limits.
+        </p>
+      </div>
+      <a href="/jewelry-planner" class="btn btn-primary" style="width: 100%; background: #b45309; border-color: #b45309;">
+        <i class="fa-solid fa-gem"></i> Start Planning
+      </a>
+    </div>
+
+    <!-- 4. Review & Community Option -->
+    <div class="card" style="border-left: 4px solid #10b981; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="badge" style="background:#ecfdf5; color:#065f46;"><i class="fa-solid fa-star"></i> Community</span>
+          <span style="font-size: 0.8rem; color: #f59e0b;"><i class="fa-solid fa-star"></i> 4.9/5.0</span>
+        </div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Reviews & Feedback</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+          Browse user reviews, read case studies from real budget planners, or submit your own planning experience.
+        </p>
+      </div>
+      <a href="/testimonials" class="btn btn-primary" style="width: 100%; background: #059669; border-color: #059669;">
+        <i class="fa-solid fa-comments"></i> Explore Reviews
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Recommendations Section -->
+<div>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.35rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Recent Recommendations
+    </h2>
+    {% if recent_plans %}
+      <a href="/history" style="font-size: 0.875rem; font-weight: 600;">View All History <i class="fa-solid fa-arrow-right"></i></a>
+    {% endif %}
+  </div>
+
+  {% if recent_plans %}
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      {% for p in recent_plans %}
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.25rem 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if p.planner_type == 'home' %}
+              <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-couch"></i>
+              </div>
+            {% elif p.planner_type == 'party' %}
+              <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: #fce7f3; color: #be185d; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-champagne-glasses"></i>
+              </div>
+            {% else %}
+              <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-gem"></i>
+              </div>
+            {% endif %}
+
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+                <span class="badge badge-{{ p.planner_type }}">{{ p.planner_type }}</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ p.created_at.strftime('%b %d, %Y') }}</span>
+                {% if p.is_fallback %}
+                  <span class="badge badge-fallback" title="Generated using realistic fallback dataset">Fallback Data</span>
+                {% endif %}
+              </div>
+              <h4 style="font-size: 1.05rem;">{{ p.title }}</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+                {{ p.result_data.get('summary', '')[:110] }}{% if p.result_data.get('summary', '')|length > 110 %}...{% endif %}
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="text-align: right;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Budget</div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">{{ p.budget | currency }}</div>
+              <div style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">{{ p.remaining_budget | currency }} left</div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              {% if p.planner_type == 'home' %}
+                <a href="/home-recommendations/{{ p.id }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-eye"></i> View</a>
+              {% elif p.planner_type == 'party' %}
+                <a href="/party-recommendations/{{ p.id }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-eye"></i> View</a>
+              {% else %}
+                <a href="/jewelry-recommendations/{{ p.id }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-eye"></i> View</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Clean Empty State -->
+    <div class="card" style="text-align: center; padding: 3.5rem 2rem;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-subtle); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1.25rem;">
+        <i class="fa-solid fa-file-invoice"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">No Recommendation Plans Yet</h3>
+      <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.9rem;">
+        You haven't generated any budget plans. Choose a planner above to get started with intelligent AI budget allocations.
+      </p>
+      <a href="/home-planner" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create Your First Plan</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

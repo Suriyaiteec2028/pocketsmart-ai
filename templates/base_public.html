@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PocketSmart AI – Your Smart Budget & Recommendation Assistant{% endblock %}</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/responsive.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="public-body">
+  <!-- Public Top Navigation Bar (Reference Design) -->
+  <header class="navbar public-navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div>
+          <div>PocketSmart <span style="color:#0ea5e9;">AI</span></div>
+          <div class="brand-tagline">Smart Budget & Recommendation Assistant</div>
+        </div>
+      </a>
+
+      <!-- Public Menu Links -->
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="/home-planner" class="nav-link"><i class="fa-solid fa-couch"></i> Home Interior</a></li>
+        <li><a href="/party-planner" class="nav-link"><i class="fa-solid fa-champagne-glasses"></i> Party & Event</a></li>
+        <li><a href="/jewelry-planner" class="nav-link"><i class="fa-solid fa-gem"></i> Jewelry & Outfit</a></li>
+        <li><a href="/testimonials" class="nav-link {% if request.url.path == '/testimonials' %}active{% endif %}"><i class="fa-solid fa-star"></i> Reviews</a></li>
+
+        <!-- Mobile actions inside drawer -->
+        <li class="nav-actions-mobile">
+          {% if user %}
+            <a href="/dashboard" class="btn btn-sm btn-primary"><i class="fa-solid fa-gauge"></i> Go to Dashboard</a>
+            <a href="/logout" class="btn btn-sm btn-secondary"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+          {% else %}
+            <a href="/login" class="btn btn-sm btn-secondary">Login</a>
+            <a href="/login" class="btn btn-sm btn-primary">Start Planning</a>
+          {% endif %}
+        </li>
+      </ul>
+
+      <!-- Desktop Right Actions -->
+      <div class="nav-actions">
+        {% if user %}
+          <a href="/dashboard" class="btn btn-sm btn-primary"><i class="fa-solid fa-gauge"></i> Open Dashboard</a>
+          <a href="/logout" class="btn btn-sm btn-secondary" title="Sign out"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        {% else %}
+          <a href="/login" class="btn btn-sm btn-secondary">Login</a>
+          <a href="/login" class="btn btn-sm btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Start Planning</a>
+        {% endif %}
+      </div>
+
+      <button class="nav-mobile-toggle" aria-label="Toggle Navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Flash/Toast message container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Main Content Wrapper for Public Pages -->
+  <main class="main-content public-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Public Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;">
+          <div class="brand-icon" style="width:32px;height:32px;font-size:0.95rem;">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <h3>PocketSmart AI</h3>
+        </div>
+        <p style="font-size:0.875rem;line-height:1.6;margin-bottom:1rem;">
+          Your Smart Budget & Recommendation Assistant. Intelligently divides budgets, analyzes requirements, and generates personalized recommendations across Home, Events, and Jewelry.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Planners</h4>
+        <ul class="footer-links">
+          <li><a href="/home-planner"><i class="fa-solid fa-couch" style="width:16px;"></i> Home Interior</a></li>
+          <li><a href="/party-planner"><i class="fa-solid fa-champagne-glasses" style="width:16px;"></i> Party & Event</a></li>
+          <li><a href="/jewelry-planner"><i class="fa-solid fa-gem" style="width:16px;"></i> Jewelry & Outfit</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul class="footer-links">
+          <li><a href="/login">User Login</a></li>
+          <li><a href="/register">Create Account</a></li>
+          <li><a href="/testimonials">Reviews & Feedback</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Partner Sourcing</h4>
+        <ul class="footer-links">
+          <li><span style="font-size:0.875rem;">Amazon & Flipkart</span></li>
+          <li><span style="font-size:0.875rem;">IKEA Furnishings</span></li>
+          <li><span style="font-size:0.875rem;">Swiggy & Zomato Catering</span></li>
+          <li><span style="font-size:0.875rem;">OYO Townhouse Stays</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 PocketSmart AI. All rights reserved. Built with FastAPI & Google Gemini.</div>
+      <div style="color:#64748b;">Prices shown are estimated recommendations. Final prices depend on partner availability.</div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,210 @@
+{% extends "base_app.html" %}
+
+{% block title %}{{ plan.title }} – Recommendations – PocketSmart AI{% endblock %}
+{% block page_title %}Party Recommendations{% endblock %}
+
+{% block content %}
+<div>
+  <!-- Header Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-party"><i class="fa-solid fa-champagne-glasses"></i> Party & Event</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ plan.created_at.strftime('%B %d, %Y') }}</span>
+        {% if plan.is_fallback %}
+          <span class="badge badge-fallback" title="Generated using realistic partner dataset">
+            <i class="fa-solid fa-triangle-exclamation"></i> Fallback Catalog
+          </span>
+        {% endif %}
+      </div>
+      <h1 style="font-size: 2rem;">{{ plan.title }}</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">{{ plan.result_data.get('summary', '') }}</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <button class="btn btn-secondary" onclick="reusePartyPlan({{ plan.id }})">
+        <i class="fa-solid fa-rotate-right"></i> Reuse Event Details
+      </button>
+      <a href="/party-planner" class="btn btn-primary" style="background: #be185d; border-color: #be185d;">
+        <i class="fa-solid fa-plus"></i> Create Another Event
+      </a>
+    </div>
+  </div>
+
+  <!-- Fallback Notice Banner if applicable -->
+  {% if plan.is_fallback %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+      <i class="fa-solid fa-circle-info" style="font-size: 1.2rem;"></i>
+      <div>Recommendations generated using realistic fallback data because the Gemini AI service is temporarily offline or unconfigured.</div>
+    </div>
+  {% endif %}
+
+  <!-- Event Summary Pills Card -->
+  {% set ev = plan.result_data.get('event_summary', {}) %}
+  <div class="card" style="margin-bottom: 1.5rem; background: #fff; border-left: 4px solid #be185d;">
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1.5rem; text-align: center;">
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Event Type</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: #be185d;">{{ ev.get('event_type', plan.input_data.get('event_type', 'Celebration')) }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Guest Count</div>
+        <div style="font-size: 1.15rem; font-weight: 800;">{{ ev.get('guest_count', plan.input_data.get('guest_count', 0)) }} People</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Venue Style</div>
+        <div style="font-size: 1.15rem; font-weight: 800;">{{ ev.get('venue_type', plan.input_data.get('venue_type', 'Banquet')) }}</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Event Date</div>
+        <div style="font-size: 1.15rem; font-weight: 800;">{{ ev.get('date', plan.input_data.get('event_date', 'Flexible')) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Summary Card -->
+  <div class="budget-summary-card" style="background: linear-gradient(135deg, #831843 0%, #be185d 100%);">
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Total Budget</span>
+      <span class="budget-stat-value">{{ plan.budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Estimated Spending</span>
+      <span class="budget-stat-value" style="color: #fbcfe8;">{{ plan.estimated_total | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Remaining Budget</span>
+      <span class="budget-stat-value remaining">{{ plan.remaining_budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Vendors / Categories</span>
+      <span class="budget-stat-value" style="color: #fdf2f8;">{{ plan.result_data.get('recommendations', [])|length }}</span>
+    </div>
+  </div>
+
+  <!-- Dynamic Budget Breakdown -->
+  {% if plan.result_data.get('allocated_budget') %}
+    <div class="card" style="margin-bottom: 2rem;">
+      <h3 class="card-title"><i class="fa-solid fa-chart-pie" style="color: #be185d;"></i> Budget Allocation Breakdown</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+        {% for cat, amt in plan.result_data.get('allocated_budget', {}).items() %}
+          <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-weight: 700; font-size: 0.95rem;">{{ cat }}</span>
+              <span style="font-weight: 800; color: #be185d;">{{ amt | currency }}</span>
+            </div>
+            {% set pct = (amt / plan.budget * 100) | round(1) %}
+            <div style="height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 0.3rem;">
+              <div style="height: 100%; width: {{ pct }}%; background: #be185d;"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right;">{{ pct }}% of budget</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Event Recommendations Grid -->
+  <div class="recommendations-grid">
+    {% for item in plan.result_data.get('recommendations', []) %}
+      <div class="rec-card">
+        <div class="rec-image-box">
+          <img src="{{ item.get('image_url') or 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=500&auto=format&fit=crop' }}" alt="{{ item.get('product_name') }}" loading="lazy">
+          <div class="rec-platform-badge">
+            {% if 'Swiggy' in item.get('platform', '') %}
+              <i class="fa-solid fa-burger" style="color: #fc8019;"></i>
+            {% elif 'Zomato' in item.get('platform', '') %}
+              <i class="fa-solid fa-utensils" style="color: #cb202d;"></i>
+            {% elif 'OYO' in item.get('platform', '') %}
+              <i class="fa-solid fa-hotel" style="color: #ee2e24;"></i>
+            {% else %}
+              <i class="fa-solid fa-champagne-glasses"></i>
+            {% endif %}
+            <span>{{ item.get('platform', 'Service Partner') }}</span>
+          </div>
+        </div>
+
+        <div class="rec-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span class="rec-category" style="color: #be185d;">{{ item.get('category') }}</span>
+            <span class="badge badge-{{ item.get('priority', 'medium')|lower }}">{{ item.get('priority', 'Medium') }}</span>
+          </div>
+
+          <h3 class="rec-title">{{ item.get('product_name') }}</h3>
+
+          <div class="rec-reason" style="border-left-color: #be185d;">
+            <i class="fa-solid fa-quote-left" style="color: #be185d; font-size: 0.75rem; margin-right: 4px;"></i>
+            {{ item.get('reason') }}
+          </div>
+
+          <div class="rec-pricing">
+            <div>
+              <div class="rec-price">{{ item.get('total_price', item.get('estimated_price', 0)) | currency }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">
+                {% if item.get('category') == 'Catering' and item.get('quantity', 1) > 1 %}
+                  ₹{{ item.get('estimated_price', 0)|int }}/guest × {{ item.get('quantity') }} guests
+                {% elif item.get('category') == 'Accommodation' and item.get('quantity', 1) > 1 %}
+                  ₹{{ item.get('estimated_price', 0)|int }}/room × {{ item.get('quantity') }} rooms
+                {% else %}
+                  Package Total
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="rec-actions">
+            {% if item.get('product_name') in saved_names %}
+              <button class="btn btn-sm btn-accent" disabled>
+                <i class="fa-solid fa-bookmark"></i> Saved
+              </button>
+            {% else %}
+              <button class="btn btn-sm btn-secondary" 
+                      onclick="saveRecommendationItem(this, {{ plan.id }}, '{{ item.get('product_name') | replace("'", "\\'") }}', '{{ item.get('category', '') }}', '{{ item.get('platform', '') }}', {{ item.get('total_price', item.get('estimated_price', 0)) }}, '{{ item | tojson | forceescape }}')">
+                <i class="fa-regular fa-bookmark"></i> Save
+              </button>
+            {% endif %}
+
+            {% if item.get('product_url') %}
+              <a href="{{ item.get('product_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary" style="flex: 1; border-color: #be185d; color: #be185d;">
+                Check on {{ item.get('platform', 'Partner') }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bottom Navigation Buttons -->
+  <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+    <a href="/history" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> View All History</a>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn btn-outline-primary" onclick="reusePartyPlan({{ plan.id }})">
+        <i class="fa-solid fa-pen-to-square"></i> Modify & Replan
+      </button>
+      <a href="/party-planner" class="btn btn-primary" style="background: #be185d; border-color: #be185d;">
+        <i class="fa-solid fa-plus"></i> New Party Plan
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function reusePartyPlan(planId) {
+  try {
+    const res = await fetch(`/api/recommendations/${planId}/reuse`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      localStorage.setItem('reuse_party_data', JSON.stringify(data.data.input_data));
+      window.location.href = data.data.target_url;
+    } else {
+      showToast('Could not load plan parameters.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while reusing plan.', 'error');
+  }
+}
+</script>
+{% endblock %}

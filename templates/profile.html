@@ -1,0 +1,195 @@
+{% extends "base_app.html" %}
+
+{% block title %}My Profile – PocketSmart AI{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container" style="max-width: 900px; margin: 0 auto;">
+  <!-- Profile Hero Header -->
+  <div class="card" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      {% set initials = (user.name.split(' ')|map('first')|join('')|upper)[:2] if user and user.name else 'U' %}
+      <div style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.85rem; font-weight: 800; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);">
+        {{ initials }}
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin: 0;" id="profile-display-name">
+            {{ user.name }}
+          </h2>
+          <span class="badge badge-success" style="font-size: 0.75rem;"><i class="fa-solid fa-circle-check"></i> Active</span>
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.925rem; margin-bottom: 0.35rem;">
+          <i class="fa-regular fa-envelope" style="margin-right: 0.35rem;"></i> {{ user.email }}
+        </div>
+        <div style="font-size: 0.8rem; color: #94a3b8;">
+          <i class="fa-regular fa-calendar-check" style="margin-right: 0.35rem;"></i> Member since {{ user.created_at.strftime('%B %d, %Y') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="display: flex; gap: 1rem;">
+      <div style="text-align: center; padding: 0.85rem 1.25rem; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); min-width: 100px;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">{{ stats.total_plans }}</div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Plans</div>
+      </div>
+      <div style="text-align: center; padding: 0.85rem 1.25rem; background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); min-width: 100px;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: #0ea5e9;">{{ stats.total_saved }}</div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Saved</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;" class="form-row">
+    <!-- Edit Information Form -->
+    <div class="card" style="padding: 2rem; border-radius: var(--radius-lg);">
+      <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-regular fa-id-card" style="color: var(--primary);"></i> Personal Details
+      </h3>
+
+      <form id="edit-profile-form" onsubmit="handleUpdateProfile(event)">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label" for="user-name">Full Name</label>
+          <input 
+            type="text" 
+            id="user-name" 
+            name="name" 
+            class="form-control" 
+            value="{{ user.name }}" 
+            required 
+            minlength="2"
+            maxlength="100"
+          >
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label" for="user-email">Email Address</label>
+          <input 
+            type="email" 
+            id="user-email" 
+            class="form-control" 
+            value="{{ user.email }}" 
+            disabled 
+            style="background: #f1f5f9; cursor: not-allowed; opacity: 0.8;"
+          >
+          <small style="color: #94a3b8; font-size: 0.75rem; display: block; margin-top: 0.35rem;">Email address cannot be changed.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="save-profile-btn" style="width: 100%;">
+          <i class="fa-solid fa-floppy-disk" style="margin-right: 0.4rem;"></i> Update Profile
+        </button>
+      </form>
+    </div>
+
+    <!-- Security & Password -->
+    <div class="card" style="padding: 2rem; border-radius: var(--radius-lg);">
+      <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Security & Password
+      </h3>
+
+      <form id="change-password-form" onsubmit="handleChangePassword(event)">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label" for="current-password">Current Password</label>
+          <input 
+            type="password" 
+            id="current-password" 
+            name="current_password" 
+            class="form-control" 
+            placeholder="Enter existing password"
+            required
+          >
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label" for="new-password">New Password</label>
+          <input 
+            type="password" 
+            id="new-password" 
+            name="new_password" 
+            class="form-control" 
+            placeholder="Minimum 6 characters"
+            required
+            minlength="6"
+          >
+        </div>
+
+        <button type="submit" class="btn btn-secondary" id="save-password-btn" style="width: 100%;">
+          <i class="fa-solid fa-key" style="margin-right: 0.4rem;"></i> Change Password
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+async function handleUpdateProfile(e) {
+  e.preventDefault();
+  const btn = document.getElementById('save-profile-btn');
+  const name = document.getElementById('user-name').value.trim();
+  
+  if (!name) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+  try {
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name })
+    });
+    const result = await res.json();
+    
+    if (result.success) {
+      showToast('Profile name updated successfully!', 'success');
+      document.getElementById('profile-display-name').textContent = result.data.name;
+      // Update top header display name
+      const headerName = document.querySelector('.user-display-name');
+      if (headerName) headerName.textContent = result.data.name;
+    } else {
+      showToast(result.detail || result.message || 'Failed to update profile.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while updating profile.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk" style="margin-right: 0.4rem;"></i> Update Profile';
+  }
+}
+
+async function handleChangePassword(e) {
+  e.preventDefault();
+  const btn = document.getElementById('save-password-btn');
+  const currentPassword = document.getElementById('current-password').value;
+  const newPassword = document.getElementById('new-password').value;
+  
+  if (!currentPassword || !newPassword) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+  try {
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword
+      })
+    });
+    const result = await res.json();
+    
+    if (result.success) {
+      showToast('Password changed successfully!', 'success');
+      document.getElementById('change-password-form').reset();
+    } else {
+      showToast(result.detail || result.message || 'Failed to change password.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while updating password.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-key" style="margin-right: 0.4rem;"></i> Change Password';
+  }
+}
+</script>
+{% endblock %}

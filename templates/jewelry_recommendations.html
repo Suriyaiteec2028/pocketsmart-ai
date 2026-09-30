@@ -1,0 +1,216 @@
+{% extends "base_app.html" %}
+
+{% block title %}{{ plan.title }} – Recommendations – PocketSmart AI{% endblock %}
+{% block page_title %}Jewelry Recommendations{% endblock %}
+
+{% block content %}
+<div>
+  <!-- Header Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-jewelry"><i class="fa-solid fa-gem"></i> Jewelry & Outfit</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ plan.created_at.strftime('%B %d, %Y') }}</span>
+        {% if plan.is_fallback %}
+          <span class="badge badge-fallback" title="Generated using intelligent fallback color-matching algorithm">
+            <i class="fa-solid fa-triangle-exclamation"></i> Fallback Engine
+          </span>
+        {% endif %}
+      </div>
+      <h1 style="font-size: 2rem;">{{ plan.title }}</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">{{ plan.result_data.get('summary', '') }}</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <button class="btn btn-secondary" onclick="reuseJewelryPlan({{ plan.id }})">
+        <i class="fa-solid fa-rotate-right"></i> Reuse Styling
+      </button>
+      <a href="/jewelry-planner" class="btn btn-primary" style="background: #b45309; border-color: #b45309;">
+        <i class="fa-solid fa-plus"></i> Style Another Outfit
+      </a>
+    </div>
+  </div>
+
+  <!-- Fallback Notice Banner if applicable -->
+  {% if plan.is_fallback %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+      <i class="fa-solid fa-circle-info" style="font-size: 1.2rem;"></i>
+      <div>Recommendations generated using local image color analysis & catalog because Gemini AI service is temporarily offline or unconfigured.</div>
+    </div>
+  {% endif %}
+
+  <!-- Multimodal Outfit Analysis Top Card -->
+  {% set analysis = plan.result_data.get('outfit_analysis', {}) %}
+  <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #f59e0b; background: #fff;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+      <div style="flex: 1; min-width: 280px;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: #b45309;"></i> AI Outfit & Color Analysis
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+          {{ analysis.get('interpretation', 'Visual analysis applied to coordinate matching jewelry.') }}
+        </p>
+
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+              Dominant Outfit Colors:
+            </div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              {% for color in analysis.get('dominant_colors', ['Navy', 'Silver']) %}
+                <span class="badge" style="background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1;">
+                  <i class="fa-solid fa-circle" style="font-size: 0.6rem; color: #3b82f6; margin-right: 4px;"></i> {{ color }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">
+              Recommended Jewelry Tones:
+            </div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              {% for tone in analysis.get('recommended_tones', ['Silver', 'Zirconia']) %}
+                <span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                  <i class="fa-solid fa-gem" style="font-size: 0.65rem; margin-right: 4px;"></i> {{ tone }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if plan.input_data.get('image_url') %}
+        <div style="text-align: center;">
+          <div style="width: 120px; height: 120px; border-radius: var(--radius-sm); overflow: hidden; border: 2px solid var(--border); box-shadow: var(--shadow-sm); margin: 0 auto 0.4rem;">
+            <img src="{{ plan.input_data.get('image_url') }}" alt="Analyzed outfit" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-camera"></i> Analyzed Photo</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Budget Summary Card -->
+  <div class="budget-summary-card" style="background: linear-gradient(135deg, #78350f 0%, #b45309 100%);">
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Total Budget</span>
+      <span class="budget-stat-value">{{ plan.budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Estimated Selection</span>
+      <span class="budget-stat-value" style="color: #fde68a;">{{ plan.estimated_total | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Remaining Budget</span>
+      <span class="budget-stat-value remaining">{{ plan.remaining_budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Jewelry Items</span>
+      <span class="budget-stat-value" style="color: #fffbeb;">{{ plan.result_data.get('recommendations', [])|length }}</span>
+    </div>
+  </div>
+
+  <!-- Jewelry Recommendations Grid -->
+  <div class="recommendations-grid">
+    {% for item in plan.result_data.get('recommendations', []) %}
+      <div class="rec-card">
+        <div class="rec-image-box">
+          <img src="{{ item.get('image_url') or 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&auto=format&fit=crop' }}" alt="{{ item.get('product_name') }}" loading="lazy">
+          <div class="rec-platform-badge">
+            {% if 'Amazon' in item.get('platform', '') %}
+              <i class="fa-brands fa-amazon" style="color: #ff9900;"></i>
+            {% elif 'Flipkart' in item.get('platform', '') %}
+              <i class="fa-solid fa-cart-shopping" style="color: #2874f0;"></i>
+            {% else %}
+              <i class="fa-solid fa-gem"></i>
+            {% endif %}
+            <span>{{ item.get('platform', 'Jewelry Retailer') }}</span>
+          </div>
+        </div>
+
+        <div class="rec-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span class="rec-category" style="color: #b45309;">{{ item.get('category', item.get('type', 'Jewelry')) }}</span>
+            <span class="badge badge-{{ item.get('priority', 'medium')|lower }}">{{ item.get('priority', 'Medium') }}</span>
+          </div>
+
+          <h3 class="rec-title">{{ item.get('product_name') }}</h3>
+
+          <div style="display: flex; gap: 0.4rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+            {% if item.get('style') %}
+              <span style="font-size: 0.75rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px;">{{ item.get('style') }}</span>
+            {% endif %}
+            {% if item.get('material') %}
+              <span style="font-size: 0.75rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px;">{{ item.get('material') }}</span>
+            {% endif %}
+          </div>
+
+          <div class="rec-reason" style="border-left-color: #b45309;">
+            <div style="font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: #b45309; margin-bottom: 2px;">Why this matches your outfit</div>
+            {{ item.get('reason') }}
+          </div>
+
+          <div class="rec-pricing">
+            <div>
+              <div class="rec-price">{{ item.get('estimated_price', 0) | currency }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Estimated Price</div>
+            </div>
+          </div>
+
+          <div class="rec-actions">
+            {% if item.get('product_name') in saved_names %}
+              <button class="btn btn-sm btn-accent" disabled>
+                <i class="fa-solid fa-bookmark"></i> Saved
+              </button>
+            {% else %}
+              <button class="btn btn-sm btn-secondary" 
+                      onclick="saveRecommendationItem(this, {{ plan.id }}, '{{ item.get('product_name') | replace("'", "\\'") }}', '{{ item.get('category', item.get('type', 'Jewelry')) }}', '{{ item.get('platform', '') }}', {{ item.get('estimated_price', 0) }}, '{{ item | tojson | forceescape }}')">
+                <i class="fa-regular fa-bookmark"></i> Save
+              </button>
+            {% endif %}
+
+            {% if item.get('product_url') %}
+              <a href="{{ item.get('product_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary" style="flex: 1; border-color: #b45309; color: #b45309;">
+                View on {{ item.get('platform', 'Store') }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bottom Navigation Buttons -->
+  <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+    <a href="/history" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> View All History</a>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn btn-outline-primary" onclick="reuseJewelryPlan({{ plan.id }})">
+        <i class="fa-solid fa-pen-to-square"></i> Modify & Replan
+      </button>
+      <a href="/jewelry-planner" class="btn btn-primary" style="background: #b45309; border-color: #b45309;">
+        <i class="fa-solid fa-plus"></i> New Jewelry Plan
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function reuseJewelryPlan(planId) {
+  try {
+    const res = await fetch(`/api/recommendations/${planId}/reuse`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      localStorage.setItem('reuse_jewelry_data', JSON.stringify(data.data.input_data));
+      window.location.href = data.data.target_url;
+    } else {
+      showToast('Could not load plan parameters.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while reusing plan.', 'error');
+  }
+}
+</script>
+{% endblock %}

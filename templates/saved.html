@@ -1,0 +1,149 @@
+{% extends "base_app.html" %}
+
+{% block title %}Saved Items – PocketSmart AI{% endblock %}
+{% block page_title %}Saved Items{% endblock %}
+
+{% block content %}
+<div class="saved-container" style="max-width: 1200px; margin: 0 auto;">
+  <!-- Header Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">
+        Your Saved Recommendations
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Bookmark and manage individual products, decor items, venues, and accessories from your generated plans.
+      </p>
+    </div>
+    <span class="badge badge-primary" style="font-size: 0.9rem; padding: 0.45rem 1rem;">
+      <i class="fa-solid fa-bookmark" style="margin-right: 0.4rem;"></i> {{ saved_items|length }} Item{% if saved_items|length != 1 %}s{% endif %}
+    </span>
+  </div>
+
+  {% if not saved_items %}
+  <!-- Empty State -->
+  <div class="card" style="text-align: center; padding: 4.5rem 2rem; border-radius: var(--radius-lg);">
+    <div style="width: 80px; height: 80px; border-radius: 50%; background: #e0e7ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 1.5rem;">
+      <i class="fa-regular fa-bookmark"></i>
+    </div>
+    <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+      No Saved Recommendations Yet
+    </h3>
+    <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 2rem; font-size: 0.95rem; line-height: 1.6;">
+      When you generate budget plans for Home Interior, Party, or Jewelry, click the bookmark icon on any item to save it here for quick access.
+    </p>
+    <a href="/dashboard" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+      <i class="fa-solid fa-compass" style="margin-right: 0.5rem;"></i> Explore Planners
+    </a>
+  </div>
+  {% else %}
+  <!-- Saved Items Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;" id="saved-grid">
+    {% for item in saved_items %}
+    <div class="card item-card" id="saved-card-{{ item.id }}" style="display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-md); padding: 1.25rem; transition: transform 0.2s, box-shadow 0.2s;">
+      <div>
+        <!-- Top meta badges and remove button -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            {% if item.item_category %}
+            <span class="badge badge-secondary" style="font-size: 0.75rem;">{{ item.item_category }}</span>
+            {% endif %}
+            {% if item.platform %}
+            <span class="badge badge-primary" style="font-size: 0.75rem;">{{ item.platform }}</span>
+            {% endif %}
+          </div>
+          <button 
+            onclick="removeSavedItem({{ item.id }})" 
+            title="Remove from saved" 
+            style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0.3rem; border-radius: 4px; transition: color 0.2s;"
+            onmouseover="this.style.color='#ef4444'" 
+            onmouseout="this.style.color='#94a3b8'">
+            <i class="fa-regular fa-trash-can" style="font-size: 1rem;"></i>
+          </button>
+        </div>
+
+        <!-- Item Name & Price -->
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.4;">
+          {{ item.item_name }}
+        </h3>
+        
+        {% if item.estimated_price %}
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem;">
+          {{ item.estimated_price|currency }}
+        </div>
+        {% endif %}
+
+        <!-- Description / Specs -->
+        {% if item.recommendation_data and item.recommendation_data.get('description') %}
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+          {{ item.recommendation_data.get('description') }}
+        </p>
+        {% elif item.recommendation_data and item.recommendation_data.get('reason') %}
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+          {{ item.recommendation_data.get('reason') }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Card Footer Actions -->
+      <div style="border-top: 1px solid var(--border); padding-top: 0.85rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 0.75rem; color: #94a3b8;">
+          <i class="fa-regular fa-clock" style="margin-right: 0.2rem;"></i> {{ item.created_at.strftime('%b %d, %Y') }}
+        </span>
+        
+        <div style="display: flex; gap: 0.5rem;">
+          {% if item.recommendation_plan_id %}
+          <a href="/recommendation/{{ item.recommendation_plan_id }}" class="btn btn-sm btn-secondary" style="font-size: 0.8rem; padding: 0.35rem 0.7rem;" title="View associated budget plan">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Plan
+          </a>
+          {% endif %}
+          {% if item.recommendation_data and item.recommendation_data.get('url') %}
+          <a href="{{ item.recommendation_data.get('url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" style="font-size: 0.8rem; padding: 0.35rem 0.7rem;">
+            Buy <i class="fa-solid fa-external-link" style="margin-left: 0.2rem;"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<script>
+async function removeSavedItem(itemId) {
+  if (!confirm('Remove this item from your saved collection?')) return;
+  
+  try {
+    const res = await fetch(`/api/recommendations/saved/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const result = await res.json();
+    
+    if (result.success) {
+      showToast('Item removed from saved list.', 'info');
+      const card = document.getElementById(`saved-card-${itemId}`);
+      if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          card.remove();
+          // Reload if no cards remain
+          const remaining = document.querySelectorAll('#saved-grid .item-card');
+          if (remaining.length === 0) {
+            window.location.reload();
+          }
+        }, 250);
+      }
+    } else {
+      showToast(result.message || 'Failed to remove item.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while removing saved item.', 'error');
+  }
+}
+</script>
+{% endblock %}

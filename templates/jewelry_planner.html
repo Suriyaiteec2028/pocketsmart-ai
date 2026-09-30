@@ -1,0 +1,179 @@
+{% extends "base_app.html" %}
+
+{% block title %}Jewelry & Outfit Styling Planner – PocketSmart AI{% endblock %}
+{% block page_title %}Jewelry & Outfit Planner{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <!-- Header -->
+  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-jewelry"><i class="fa-solid fa-gem"></i> Multimodal AI Stylist</span>
+      </div>
+      <h1 style="font-size: 2rem;">Jewelry & Outfit Budget Planner</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Upload your outfit photo or specify style tones. Gemini AI analyzes colors and necklines to recommend matching jewelry pieces strictly within your budget.
+      </p>
+    </div>
+    <a href="/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  </div>
+
+  <form id="jewelry-planner-form">
+    <!-- Step 1: Budget & Occasion -->
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+      <h3 class="card-title"><i class="fa-solid fa-wallet" style="color: #b45309;"></i> 1. Budget & Occasion</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="budget" class="form-label">Total Budget (INR ₹) <span class="required">*</span></label>
+          <input type="number" id="budget" class="form-control" placeholder="e.g. 5000" min="500" step="500" value="5000" required>
+          <div class="form-hint">AI guarantees total item prices stay within this amount.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="occasion" class="form-label">Occasion <span class="required">*</span></label>
+          <select id="occasion" class="form-select">
+            <option value="Wedding" selected>Wedding / Reception</option>
+            <option value="Engagement">Engagement / Roka</option>
+            <option value="Festival">Festive Celebration (Diwali / Eid / Puja)</option>
+            <option value="Party">Evening Cocktail / Party</option>
+            <option value="Birthday">Birthday Celebration</option>
+            <option value="Office">Office / Formal Workwear</option>
+            <option value="Casual">Casual / Everyday Elegance</option>
+            <option value="Gift">Gift for Loved One</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Jewelry Preferences -->
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+      <h3 class="card-title"><i class="fa-solid fa-gem" style="color: #b45309;"></i> 2. Jewelry Category & Style</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="jewelry-type" class="form-label">Jewelry Type</label>
+          <select id="jewelry-type" class="form-select">
+            <option value="Any" selected>Any (AI Curated Mix)</option>
+            <option value="Set">Complete Choker / Bridal Set</option>
+            <option value="Necklace">Necklace / Choker Only</option>
+            <option value="Earrings">Earrings / Jhumkis Only</option>
+            <option value="Bracelet">Bracelet / Tennis Chain</option>
+            <option value="Ring">Finger Ring / Solitaire</option>
+            <option value="Bangles">Bangles / Kada</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="preferred-style" class="form-label">Preferred Style</label>
+          <select id="preferred-style" class="form-select">
+            <option value="Elegant" selected>Elegant & Sophisticated</option>
+            <option value="Traditional">Traditional / Kundan / Temple</option>
+            <option value="Modern">Modern Minimalist</option>
+            <option value="Luxury">Luxury Statement</option>
+            <option value="Fusion">Indo-Western Fusion</option>
+            <option value="Minimal">Subtle / Everyday Minimal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="preferred-material" class="form-label">Preferred Material</label>
+          <select id="preferred-material" class="form-select">
+            <option value="Any" selected>Any (Value-for-Money Choice)</option>
+            <option value="Silver">925 Sterling Silver</option>
+            <option value="Gold Plated">Gold Plated / Antique Finish</option>
+            <option value="Diamond Look">Cubic Zirconia (Diamond Look)</option>
+            <option value="Artificial">Artificial / Imitation Craft</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="preferred-color" class="form-label">Metal Tone / Color</label>
+          <select id="preferred-color" class="form-select">
+            <option value="Any" selected>Any (Match Outfit)</option>
+            <option value="Gold">Yellow Gold</option>
+            <option value="Silver">Silver / Platinum Tone</option>
+            <option value="Rose Gold">Rose Gold</option>
+            <option value="Multi-color">Multi-color / Gemstone Enamel</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Multimodal Outfit Photo & Description -->
+    <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #f59e0b;">
+      <h3 class="card-title"><i class="fa-solid fa-camera" style="color: #b45309;"></i> 3. Outfit Analysis (Multimodal AI)</h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+        Upload a photo of your saree, suit, gown, or dress. Gemini Vision AI analyzes fabric colors and patterns to recommend matching metal tones.
+      </p>
+
+      <!-- Drag & Drop Zone -->
+      <div id="image-drop-zone" style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: var(--transition); background: #fafafa;">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.75rem;"></i>
+        <h4 style="font-size: 1.05rem; margin-bottom: 0.25rem;">Drag & drop your outfit photo here</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Supports JPG, JPEG, PNG, WEBP (Max 5MB)</p>
+        <label for="outfit-image-input" class="btn btn-sm btn-secondary" style="cursor: pointer;">
+          <i class="fa-solid fa-folder-open"></i> Browse File
+        </label>
+        <input type="file" id="outfit-image-input" accept="image/jpeg,image/png,image/webp" style="display: none;">
+      </div>
+
+      <!-- Image Preview Container -->
+      <div id="image-preview-container" style="display: none; margin-top: 1rem; text-align: center; background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md);">
+        <div style="position: relative; display: inline-block;">
+          <img id="preview-image" src="" alt="Outfit preview" style="max-height: 220px; max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-md);">
+          <button type="button" id="remove-image-btn" class="btn btn-sm btn-danger-outline" style="position: absolute; top: -10px; right: -10px; background: #fff; border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-top: 0.75rem;">
+          <i class="fa-solid fa-circle-check"></i> Outfit image attached for visual analysis
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label for="outfit-description" class="form-label">Outfit Description (Optional or Additional Context)</label>
+        <textarea id="outfit-description" class="form-textarea" rows="2" placeholder="e.g. Royal navy blue banarasi saree with intricate silver zardozi embroidery and scoop neckline."></textarea>
+      </div>
+    </div>
+
+    <!-- Submit CTA -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <button type="submit" id="generate-jewelry-btn" class="btn btn-lg btn-primary" style="padding: 1rem 3rem; font-size: 1.15rem; background: #b45309; border-color: #b45309;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Jewelry Recommendations
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-card">
+    <div class="loading-spinner" style="border-top-color: #b45309;"></div>
+    <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Styling Your Jewelry</h3>
+    <p style="color: var(--text-muted); font-size: 0.875rem;">PocketSmart AI is performing multimodal vision matching...</p>
+
+    <div class="loading-steps">
+      <div id="j-step-1" class="step-item active">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Extracting dominant outfit color palette & style tones...</span>
+      </div>
+      <div id="j-step-2" class="step-item">
+        <i class="fa-regular fa-circle"></i>
+        <span>Matching jewelry metals, stones, and occasion aesthetic...</span>
+      </div>
+      <div id="j-step-3" class="step-item">
+        <i class="fa-regular fa-circle"></i>
+        <span>Verifying prices within your ₹ budget ceiling...</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/jewelry.js"></script>
+{% endblock %}

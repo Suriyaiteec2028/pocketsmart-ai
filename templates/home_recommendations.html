@@ -1,0 +1,247 @@
+{% extends "base_app.html" %}
+
+{% block title %}{{ plan.title }} – Recommendations – PocketSmart AI{% endblock %}
+{% block page_title %}Home Recommendations{% endblock %}
+
+{% block content %}
+<div>
+  <!-- Header Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <span class="badge badge-home"><i class="fa-solid fa-couch"></i> Home Interior</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ plan.created_at.strftime('%B %d, %Y') }}</span>
+        {% if plan.is_fallback %}
+          <span class="badge badge-fallback" title="Recommendations generated using fallback data because AI service is temporarily unavailable.">
+            <i class="fa-solid fa-triangle-exclamation"></i> Fallback Catalog
+          </span>
+        {% endif %}
+      </div>
+      <h1 style="font-size: 2rem;">{{ plan.title }}</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">{{ plan.result_data.get('summary', '') }}</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <button class="btn btn-secondary" onclick="reusePlan({{ plan.id }})">
+        <i class="fa-solid fa-rotate-right"></i> Reuse Parameters
+      </button>
+      <a href="/home-planner" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Create Another Plan
+      </a>
+    </div>
+  </div>
+
+  <!-- Fallback Notice Banner if applicable -->
+  {% if plan.is_fallback %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+      <i class="fa-solid fa-circle-info" style="font-size: 1.2rem;"></i>
+      <div>Recommendations generated using realistic fallback data because the Gemini AI service is temporarily offline or unconfigured.</div>
+    </div>
+  {% endif %}
+
+  <!-- Top Metric Summary Card -->
+  <div class="budget-summary-card">
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Total Budget</span>
+      <span class="budget-stat-value">{{ plan.budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Estimated Spending</span>
+      <span class="budget-stat-value" style="color: #93c5fd;">{{ plan.estimated_total | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Remaining Budget</span>
+      <span class="budget-stat-value remaining">{{ plan.remaining_budget | currency }}</span>
+    </div>
+    <div class="budget-stat-item">
+      <span class="budget-stat-label">Recommended Items</span>
+      <span class="budget-stat-value" style="color: #cbd5e1;">{{ plan.result_data.get('recommendations', [])|length }}</span>
+    </div>
+  </div>
+
+  <!-- Budget Allocation Breakdown by Room -->
+  {% if plan.result_data.get('allocated_budget') %}
+    <div class="card" style="margin-bottom: 2rem;">
+      <h3 class="card-title"><i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i> Room-by-Room Allocation</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+        {% for room, amt in plan.result_data.get('allocated_budget', {}).items() %}
+          <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-weight: 700; font-size: 0.95rem;">{{ room }}</span>
+              <span style="font-weight: 800; color: var(--primary);">{{ amt | currency }}</span>
+            </div>
+            {% set pct = (amt / plan.budget * 100) | round(1) %}
+            <div style="height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 0.3rem;">
+              <div style="height: 100%; width: {{ pct }}%; background: var(--primary);"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right;">{{ pct }}% of total budget</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Filter Controls -->
+  <div class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.95rem;">
+        <i class="fa-solid fa-filter" style="color: var(--primary);"></i> Filter Items:
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <select id="filter-category" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.85rem;" onchange="applyFilters()">
+          <option value="all">All Categories</option>
+          <option value="Sofa">Sofas</option>
+          <option value="Bed">Beds & Mattresses</option>
+          <option value="Lighting">Lighting</option>
+          <option value="Storage">Storage & Wardrobes</option>
+          <option value="Table">Tables</option>
+          <option value="Rug">Rugs & Curtains</option>
+        </select>
+
+        <select id="filter-platform" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.85rem;" onchange="applyFilters()">
+          <option value="all">All Platforms</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Flipkart">Flipkart</option>
+          <option value="IKEA">IKEA</option>
+        </select>
+
+        <select id="filter-priority" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.85rem;" onchange="applyFilters()">
+          <option value="all">All Priorities</option>
+          <option value="High">High Priority</option>
+          <option value="Medium">Medium Priority</option>
+          <option value="Low">Low Priority</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommendation Cards Grid -->
+  <div class="recommendations-grid" id="recommendations-grid">
+    {% for item in plan.result_data.get('recommendations', []) %}
+      <div class="rec-card" 
+           data-category="{{ item.get('category', '') }}" 
+           data-platform="{{ item.get('platform', '') }}"
+           data-priority="{{ item.get('priority', 'Medium') }}"
+           data-price="{{ item.get('estimated_price', 0) }}">
+        
+        <div class="rec-image-box">
+          <img src="{{ item.get('image_url') or 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&auto=format&fit=crop' }}" alt="{{ item.get('product_name') }}" loading="lazy">
+          <div class="rec-platform-badge">
+            {% if 'Amazon' in item.get('platform', '') %}
+              <i class="fa-brands fa-amazon" style="color: #ff9900;"></i>
+            {% elif 'Flipkart' in item.get('platform', '') %}
+              <i class="fa-solid fa-cart-shopping" style="color: #2874f0;"></i>
+            {% elif 'IKEA' in item.get('platform', '') %}
+              <i class="fa-solid fa-couch" style="color: #0058a3;"></i>
+            {% else %}
+              <i class="fa-solid fa-bag-shopping"></i>
+            {% endif %}
+            <span>{{ item.get('platform', 'Retail Partner') }}</span>
+          </div>
+        </div>
+
+        <div class="rec-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span class="rec-category">{{ item.get('category') }}</span>
+            <span class="badge badge-{{ item.get('priority', 'medium')|lower }}">{{ item.get('priority', 'Medium') }}</span>
+          </div>
+
+          <h3 class="rec-title">{{ item.get('product_name') }}</h3>
+
+          <div class="rec-reason">
+            <i class="fa-solid fa-quote-left" style="color: var(--primary); font-size: 0.75rem; margin-right: 4px;"></i>
+            {{ item.get('reason') }}
+          </div>
+
+          <div class="rec-pricing">
+            <div>
+              <div class="rec-price">{{ item.get('estimated_price', 0) | currency }}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Estimated Price</div>
+            </div>
+            {% if item.get('quantity', 1) > 1 %}
+              <div style="text-align: right;">
+                <div style="font-weight: 700; color: var(--text-main);">Qty: {{ item.get('quantity') }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Total: {{ item.get('total_price') | currency }}</div>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="rec-actions">
+            {% if item.get('product_name') in saved_names %}
+              <button class="btn btn-sm btn-accent" disabled>
+                <i class="fa-solid fa-bookmark"></i> Saved
+              </button>
+            {% else %}
+              <button class="btn btn-sm btn-secondary" 
+                      onclick="saveRecommendationItem(this, {{ plan.id }}, '{{ item.get('product_name') | replace("'", "\\'") }}', '{{ item.get('category', '') }}', '{{ item.get('platform', '') }}', {{ item.get('estimated_price', 0) }}, '{{ item | tojson | forceescape }}')">
+                <i class="fa-regular fa-bookmark"></i> Save
+              </button>
+            {% endif %}
+
+            {% if item.get('product_url') %}
+              <a href="{{ item.get('product_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary" style="flex: 1;">
+                View on {{ item.get('platform', 'Store') }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bottom Navigation Buttons -->
+  <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+    <a href="/history" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> View All History</a>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn btn-outline-primary" onclick="reusePlan({{ plan.id }})">
+        <i class="fa-solid fa-pen-to-square"></i> Modify & Replan
+      </button>
+      <a href="/home-planner" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> New Home Plan
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function applyFilters() {
+  const cat = document.getElementById('filter-category').value.toLowerCase();
+  const plat = document.getElementById('filter-platform').value.toLowerCase();
+  const prio = document.getElementById('filter-priority').value.toLowerCase();
+
+  const cards = document.querySelectorAll('.rec-card');
+  cards.forEach(card => {
+    const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
+    const cardPlat = (card.getAttribute('data-platform') || '').toLowerCase();
+    const cardPrio = (card.getAttribute('data-priority') || '').toLowerCase();
+
+    const matchesCat = (cat === 'all') || cardCat.includes(cat);
+    const matchesPlat = (plat === 'all') || cardPlat.includes(plat);
+    const matchesPrio = (prio === 'all') || cardPrio === prio;
+
+    if (matchesCat && matchesPlat && matchesPrio) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+async function reusePlan(planId) {
+  try {
+    const res = await fetch(`/api/recommendations/${planId}/reuse`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      localStorage.setItem('reuse_home_data', JSON.stringify(data.data.input_data));
+      window.location.href = data.data.target_url;
+    } else {
+      showToast('Could not load plan parameters.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error while reusing plan.', 'error');
+  }
+}
+</script>
+{% endblock %}

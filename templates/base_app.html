@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PocketSmart AI – Your Smart Budget & Recommendation Assistant{% endblock %}</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/responsive.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="app-body">
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar(false)"></div>
+
+  <div class="app-layout" id="app-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <!-- Sidebar Branding (matches reference design logo) -->
+      <div class="sidebar-brand-wrapper">
+        <a href="/dashboard" class="sidebar-brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div class="sidebar-brand-text">
+            <div class="brand-title">PocketSmart <span style="color:#0ea5e9;">AI</span></div>
+            <div class="brand-tagline">Smart Budget & Recommendation</div>
+          </div>
+        </a>
+        <button class="sidebar-close-btn" onclick="toggleMobileSidebar(false)" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Menu -->
+      <div class="sidebar-nav-container">
+        <!-- Section: MAIN -->
+        <div class="sidebar-heading">MAIN</div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="/dashboard" class="sidebar-link {% if request.url.path == '/dashboard' %}active{% endif %}" title="Dashboard">
+              <span class="sidebar-icon"><i class="fa-solid fa-table-columns"></i></span>
+              <span class="sidebar-label">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/home-planner" class="sidebar-link {% if '/home' in request.url.path %}active{% endif %}" title="Home Interior">
+              <span class="sidebar-icon"><i class="fa-solid fa-couch"></i></span>
+              <span class="sidebar-label">Home Interior</span>
+            </a>
+          </li>
+          <li>
+            <a href="/party-planner" class="sidebar-link {% if '/party' in request.url.path %}active{% endif %}" title="Party & Event">
+              <span class="sidebar-icon"><i class="fa-solid fa-champagne-glasses"></i></span>
+              <span class="sidebar-label">Party & Event</span>
+            </a>
+          </li>
+          <li>
+            <a href="/jewelry-planner" class="sidebar-link {% if '/jewelry' in request.url.path %}active{% endif %}" title="Jewelry & Outfit">
+              <span class="sidebar-icon"><i class="fa-solid fa-gem"></i></span>
+              <span class="sidebar-label">Jewelry & Outfit</span>
+            </a>
+          </li>
+          <li>
+            <a href="/history" class="sidebar-link {% if request.url.path == '/history' %}active{% endif %}" title="Recommendation History">
+              <span class="sidebar-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+              <span class="sidebar-label">Recommendation History</span>
+            </a>
+          </li>
+          <li>
+            <a href="/saved" class="sidebar-link {% if request.url.path == '/saved' %}active{% endif %}" title="Saved Recommendations">
+              <span class="sidebar-icon"><i class="fa-solid fa-bookmark"></i></span>
+              <span class="sidebar-label">Saved Recommendations</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Section: ACCOUNT -->
+        <div class="sidebar-heading">ACCOUNT</div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="/profile" class="sidebar-link {% if request.url.path == '/profile' %}active{% endif %}" title="Profile">
+              <span class="sidebar-icon"><i class="fa-solid fa-circle-user"></i></span>
+              <span class="sidebar-label">Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="/settings" class="sidebar-link {% if request.url.path == '/settings' %}active{% endif %}" title="Settings">
+              <span class="sidebar-icon"><i class="fa-solid fa-sliders"></i></span>
+              <span class="sidebar-label">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- BOTTOM OF SIDEBAR: Collapse Button & Logout -->
+      <div class="sidebar-footer">
+        <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse Sidebar">
+          <i class="fa-solid fa-chevron-left" id="collapse-icon"></i>
+          <span class="sidebar-label">Collapse Menu</span>
+        </button>
+
+        <a href="/logout" class="sidebar-link logout-link" title="Logout">
+          <span class="sidebar-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+          <span class="sidebar-label">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN WRAPPER (Top Header + Content Area) -->
+    <div class="app-main-wrapper">
+      <!-- TOP AUTHENTICATED HEADER -->
+      <header class="app-top-header">
+        <div class="header-left">
+          <button class="header-mobile-toggle" onclick="toggleMobileSidebar(true)" aria-label="Open Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-page-title">
+            {% block page_title %}Dashboard{% endblock %}
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Notification Bell -->
+          <div class="header-notification-btn" title="Notifications" onclick="showToast('You have no unread notifications.', 'info')">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-badge"></span>
+          </div>
+
+          <!-- User Profile & Dropdown -->
+          <div class="header-user-dropdown" id="user-dropdown-container">
+            <button class="user-profile-btn" onclick="toggleUserDropdown(event)" aria-haspopup="true">
+              {% set initials = (user.name.split(' ')|map('first')|join('')|upper)[:2] if user and user.name else 'U' %}
+              <div class="user-avatar-circle">{{ initials }}</div>
+              <span class="user-display-name">{{ user.name if user else 'Account' }}</span>
+              <i class="fa-solid fa-chevron-down dropdown-caret"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown-menu" id="user-dropdown-menu">
+              <div class="dropdown-header">
+                <div style="font-weight:700;color:var(--text-main);">{{ user.name if user else 'User' }}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">{{ user.email if user else '' }}</div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="/profile" class="dropdown-item">
+                <i class="fa-solid fa-circle-user"></i> Profile
+              </a>
+              <a href="/settings" class="dropdown-item">
+                <i class="fa-solid fa-sliders"></i> Settings
+              </a>
+              <a href="/saved" class="dropdown-item">
+                <i class="fa-solid fa-bookmark"></i> Saved Items
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/logout" class="dropdown-item dropdown-logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Flash / Toast notifications container -->
+      <div id="toast-container" class="toast-container"></div>
+
+      <!-- MAIN CONTENT VIEW AREA -->
+      <main class="app-content-area">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+  <script>
+    // Sidebar Collapse state handling (persisted in localStorage)
+    function applySidebarState() {
+      const isCollapsed = localStorage.getItem('ps_sidebar_collapsed') === 'true';
+      const layout = document.getElementById('app-layout');
+      const icon = document.getElementById('collapse-icon');
+      if (layout) {
+        if (isCollapsed) {
+          layout.classList.add('sidebar-collapsed');
+          if (icon) icon.className = 'fa-solid fa-chevron-right';
+        } else {
+          layout.classList.remove('sidebar-collapsed');
+          if (icon) icon.className = 'fa-solid fa-chevron-left';
+        }
+      }
+    }
+
+    function toggleSidebarCollapse() {
+      const layout = document.getElementById('app-layout');
+      const isCurrentlyCollapsed = layout.classList.contains('sidebar-collapsed');
+      const newState = !isCurrentlyCollapsed;
+      localStorage.setItem('ps_sidebar_collapsed', newState);
+      applySidebarState();
+    }
+
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById('app-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar && overlay) {
+        if (open) {
+          sidebar.classList.add('mobile-open');
+          overlay.classList.add('active');
+        } else {
+          sidebar.classList.remove('mobile-open');
+          overlay.classList.remove('active');
+        }
+      }
+    }
+
+    function toggleUserDropdown(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu) menu.classList.toggle('show');
+    }
+
+    // Close dropdown on outside click
+    window.addEventListener('click', (e) => {
+      const container = document.getElementById('user-dropdown-container');
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu && container && !container.contains(e.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applySidebarState();
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
