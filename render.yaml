@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: pocketsmart-ai
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: APP_NAME
+        value: "PocketSmart AI"
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: DATABASE_URL
+        value: sqlite:///./pocketsmart.db
